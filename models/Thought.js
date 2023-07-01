@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 
 //reaction subdocument
 const reactionSchema = new mongoose.Schema({
