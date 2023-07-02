@@ -94,6 +94,7 @@ module.exports = {
     async addReaction (req, res) {
         try {
             const reaction = req.body;
+            console.log (reaction)
             const thought = await Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 { $push: {reactions: reaction}},
@@ -112,36 +113,25 @@ module.exports = {
     },
 
     //delete a reaction
-    async deleteReaction (req, res) {
-        try {            
-            const reactionId = req.body;
-
-            const thought= await Thought.findOne({_id: req.params.thoughtId});
-
-            if(!thought){
-                return res.status(404).json({message: 'no thought with that ID'})
-            }
-
-            // Find the index of the reaction within the reactions array
-            const reactionIndex = thought.reactions.findIndex(
-                (reaction) => reaction.reactionId === reactionId.reactionId
-            );
+    async deleteReaction(req, res) {
+        try {
+          const reactionId = req.body.reactionId;
+          console.log(reactionId);
       
-  
-            // If the reaction is not found, return a 404 status and message
-            if (reactionIndex === -1) {
-                return res.status(404).json({ message: 'No reaction with this id!' });
-            }
-
-            thought.reactions.splice(reactionIndex, 1);
-            await thought.save();
-
-            res.json({ message: 'Reaction deleted successfully' });
-
-        }catch(err){
-            res.status(500).json(err);
+          const thought = await Thought.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { _id: reactionId } } },
+            { new: true }
+          );
+      
+          if (!thought) {
+            return res.status(404).json({ message: 'No thought with that ID' });
+          }
+      
+          res.json({ message: 'Reaction deleted successfully' });
+        } catch (err) {
+          res.status(500).json(err);
         }
-
-    },
+      },
 
 };
